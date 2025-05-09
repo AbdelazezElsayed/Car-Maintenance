@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CarCare Pro Dashboard</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-car"></i>
+                    <span>CarCare Pro</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li class="active">
+                    <a href="/index">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/chat">
+                        <i class="fas fa-comments"></i>
+                        <span>AI Assistant</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/tire">
+                        <i class="fas fa-cog"></i>
+                        <span>Tire Analysis</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/maintenance">
+                        <i class="fas fa-tools"></i>
+                        <span>Maintenance</span>
+                    </a>
+                </li>
+                <li class="logout">
+                    <a href="/login">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header">
+                <div class="welcome-section">
+                    <h1>Welcome to CarCare Pro</h1>
+                    <p class="user-greeting">Hello, <span id="username">User</span>!</p>
+                </div>
+                <div class="user-profile">
+                    <img src="/assets/default-avatar.png" alt="User Profile" class="avatar">
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </div>
+                </div>
+            </header>
+
+            <div class="dashboard-grid">
+                <!-- Feature Cards -->
+                <div class="feature-card ai-assistant">
+                    <div class="card-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>AI Assistant</h3>
+                    <p>Get instant answers to your car maintenance questions using our AI-powered assistant.</p>
+                    <a href="/chat" class="card-link">Chat Now</a>
+                </div>
+
+                <div class="feature-card tire-analysis">
+                    <div class="card-icon">
+                        <i class="fas fa-tire"></i>
+                    </div>
+                    <h3>Tire Analysis</h3>
+                    <p>Upload tire images for AI-powered wear analysis and recommendations.</p>
+                    <a href="/tire" class="card-link">Analyze Tires</a>
+                </div>
+
+                <div class="feature-card maintenance">
+                    <div class="card-icon">
+                        <i class="fas fa-tools"></i>
+                    </div>
+                    <h3>Maintenance Tracking</h3>
+                    <p>Track your vehicle's maintenance history and get reminders for upcoming services.</p>
+                    <a href="/maintenance" class="card-link">View Schedule</a>
+                </div>
+
+                <div class="feature-card reports">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Reports & Analytics</h3>
+                    <p>View detailed reports and analytics about your vehicle's maintenance history.</p>
+                    <a href="/reports" class="card-link">View Reports</a>
+                </div>
+            </div>
+
+            <!-- Recent Activity Section -->
+            <section class="recent-activity">
+                <h2>Recent Activity</h2>
+                <div class="activity-list">
+                    <div class="activity-item">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="activity-details">
+                            <p>Tire Analysis Completed</p>
+                            <span class="activity-time">2 hours ago</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <i class="fas fa-comment"></i>
+                        <div class="activity-details">
+                            <p>AI Chat Session</p>
+                            <span class="activity-time">Yesterday</span>
+                        </div>
+                    </div>
+                    <div class="activity-item">
+                        <i class="fas fa-oil-can"></i>
+                        <div class="activity-details">
+                            <p>Oil Change Reminder</p>
+                            <span class="activity-time">3 days ago</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Get user information from localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                window.location.href = '/login';
+                return;
+            }
+
+            // Get user profile
+            fetch('/api/auth/profile', {
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('username').textContent = data.name;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                window.location.href = '/login';
+            });
+        });
+
+        // Handle logout
+        document.querySelector('.logout a').addEventListener('click', function(e) {
+            e.preventDefault();
+            localStorage.removeItem('token');
+            window.location.href = '/login';
+        });
+    </script>
+</body>
+</html>
