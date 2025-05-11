@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #666;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Page</h1>
+        <p>This is a test page to verify that the frontend is working correctly.</p>
+        <p class="success">If you can see this page, the frontend is working!</p>
+        
+        <h2>Links to other pages:</h2>
+        <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/login.html">Login</a></li>
+            <li><a href="/register.html">Register</a></li>
+        </ul>
+        
+        <h2>API Test:</h2>
+        <button id="testApi">Test API</button>
+        <div id="apiResult"></div>
+        
+        <script>
+            document.getElementById('testApi').addEventListener('click', function() {
+                fetch('/api/health')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('apiResult').innerHTML = 
+                            '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
+                    })
+                    .catch(error => {
+                        document.getElementById('apiResult').innerHTML = 
+                            '<p style="color:red">Error: ' + error.message + '</p>';
+                    });
+            });
+        </script>
+    </div>
+</body>
+</html>

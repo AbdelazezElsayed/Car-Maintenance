@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - CarCare Pro</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/admin.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-car"></i>
+                    <span>CarCare Pro</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="/index">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/chat">
+                        <i class="fas fa-comments"></i>
+                        <span>AI Assistant</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/tire">
+                        <i class="fas fa-cog"></i>
+                        <span>Tire Analysis</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/maintenance">
+                        <i class="fas fa-tools"></i>
+                        <span>Maintenance</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="/admin">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Admin</span>
+                    </a>
+                </li>
+                <li class="logout">
+                    <a href="/login">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header">
+                <div class="welcome-section">
+                    <h1>Admin Dashboard</h1>
+                    <p class="subtitle">Manage users and system settings</p>
+                </div>
+                <div class="admin-badge">
+                    <span class="badge">Admin</span>
+                </div>
+            </header>
+
+            <!-- Admin Tabs -->
+            <div class="admin-tabs">
+                <button class="tab-button active" data-tab="users">Users</button>
+                <button class="tab-button" data-tab="settings">Settings</button>
+                <button class="tab-button" data-tab="logs">System Logs</button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Users Tab -->
+                <div class="tab-pane active" id="users-tab">
+                    <div class="admin-card">
+                        <div class="card-header">
+                            <h2>User Management</h2>
+                            <button id="add-user-btn" class="btn-primary">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                        </div>
+                        <div class="user-search">
+                            <input type="text" id="user-search" placeholder="Search users...">
+                            <button class="btn-search"><i class="fas fa-search"></i></button>
+                        </div>
+                        <div class="users-table-container">
+                            <table class="users-table">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Status</th>
+                                        <th>Created</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="users-table-body">
+                                    <!-- User rows will be added here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Settings Tab -->
+                <div class="tab-pane" id="settings-tab">
+                    <div class="admin-card">
+                        <h2>System Settings</h2>
+                        <form id="settings-form">
+                            <div class="form-group">
+                                <label for="site-name">Site Name</label>
+                                <input type="text" id="site-name" value="CarCare Pro">
+                            </div>
+                            <div class="form-group">
+                                <label for="maintenance-mode">Maintenance Mode</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="maintenance-mode">
+                                    <label for="maintenance-mode"></label>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="registration-enabled">User Registration</label>
+                                <div class="toggle-switch">
+                                    <input type="checkbox" id="registration-enabled" checked>
+                                    <label for="registration-enabled"></label>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn-primary">Save Settings</button>
+                        </form>
+                    </div>
+
+                    <!-- Email Configuration Card -->
+                    <div class="admin-card">
+                        <h2>Email Configuration</h2>
+                        <div class="email-config-status">
+                            <div id="email-status-indicator" class="status-indicator unknown">
+                                <i class="fas fa-question-circle"></i>
+                            </div>
+                            <div class="status-details">
+                                <h3 id="email-status-title">Unknown</h3>
+                                <p id="email-status-message">Click "Test Configuration" to check email settings</p>
+                            </div>
+                        </div>
+
+                        <div class="email-config-details" id="email-config-details">
+                            <!-- Details will be populated by JavaScript -->
+                        </div>
+
+                        <div class="email-config-actions">
+                            <button id="test-email-btn" class="btn-primary">
+                                <i class="fas fa-vial"></i> Test Configuration
+                            </button>
+                            <button id="send-test-email-btn" class="btn-secondary" disabled>
+                                <i class="fas fa-paper-plane"></i> Send Test Email
+                            </button>
+                        </div>
+
+                        <div class="email-help-section">
+                            <h3>Email Configuration Help</h3>
+                            <p>To configure email sending, update your .env file with the following:</p>
+                            <pre>
+EMAIL_USERNAME=your-email@gmail.com
+EMAIL_PASSWORD=your-app-password
+EMAIL_FROM=noreply@carcarepro.com</pre>
+                            <p><strong>For Gmail users:</strong> You need to use an App Password:</p>
+                            <ol>
+                                <li>Enable 2-Step Verification on your Google account</li>
+                                <li>Go to <a href="https://myaccount.google.com/apppasswords" target="_blank">Google App Passwords</a></li>
+                                <li>Generate an App Password for "Mail" and use it in EMAIL_PASSWORD</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logs Tab -->
+                <div class="tab-pane" id="logs-tab">
+                    <div class="admin-card">
+                        <h2>System Logs</h2>
+                        <div class="log-filters">
+                            <select id="log-level">
+                                <option value="all">All Levels</option>
+                                <option value="info">Info</option>
+                                <option value="warning">Warning</option>
+                                <option value="error">Error</option>
+                            </select>
+                            <input type="date" id="log-date">
+                            <button class="btn-primary" id="refresh-logs">Refresh</button>
+                        </div>
+                        <div class="logs-container">
+                            <pre id="logs-content">Loading logs...</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Add User Modal -->
+    <div class="modal" id="add-user-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New User</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="add-user-form">
+                    <div class="form-group">
+                        <label for="new-user-name">Name</label>
+                        <input type="text" id="new-user-name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-user-email">Email</label>
+                        <input type="email" id="new-user-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-user-password">Password</label>
+                        <input type="password" id="new-user-password" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-user-role">Role</label>
+                        <select id="new-user-role">
+                            <option value="user">User</option>
+                            <option value="admin">Admin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="new-user-verified">Email Verified</label>
+                        <div class="toggle-switch">
+                            <input type="checkbox" id="new-user-verified" checked>
+                            <label for="new-user-verified"></label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary">Add User</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="/scripts/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email - CarCare Pro</title>
+    <link rel="stylesheet" href="/styles/main.css">
+</head>
+<body>
+    <div class="split-container">
+        <div class="left-panel">
+            <h1>Verify Your Email</h1>
+            <p class="subtitle">Please enter the verification code sent to your email to complete your registration.</p>
+            <div class="car-icon">🚗</div>
+        </div>
+        <div class="right-panel">
+            <div class="login-form">
+                <div class="car-icon-small">🚗</div>
+                <h2>Email Verification</h2>
+                <form id="verificationForm">
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">✉️</span>
+                            <input type="email" id="email" name="email" placeholder="Enter your email" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="code">Verification Code</label>
+                        <div class="input-with-icon">
+                            <span class="input-icon">🔑</span>
+                            <input type="text" id="code" name="code" placeholder="Enter verification code" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-login">Verify Email</button>
+                </form>
+                <div class="resend-code">
+                    <p>Didn't receive a code? <a href="#" id="resendCode">Resend Code</a></p>
+                </div>
+                <div id="dev-mode-info" style="display: none; margin-top: 20px; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+                    <h3 style="margin-top: 0; color: #3498db;">Development Mode</h3>
+                    <p>Since email sending is not configured, verification codes are printed to the server console.</p>
+                    <p>Check the terminal where you started the server to see the verification code.</p>
+                    <p>You can also check the verification code in the browser console by clicking the button below:</p>
+                    <button id="check-code" class="btn-login" style="background-color: #2ecc71;">Check Verification Code</button>
+                    <div id="code-display" style="margin-top: 10px; font-weight: bold;"></div>
+                </div>
+                <p class="create-account">
+                    <a href="/login">Back to Login</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for email in URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email');
+
+            if (email) {
+                document.getElementById('email').value = email;
+            }
+
+            // Check if we're in development mode
+            checkDevelopmentMode();
+        });
+
+        async function checkDevelopmentMode() {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+
+                if (data.mode === 'development') {
+                    // Show development mode info
+                    document.getElementById('dev-mode-info').style.display = 'block';
+
+                    // Add event listener for the check code button
+                    document.getElementById('check-code').addEventListener('click', async function() {
+                        const email = document.getElementById('email').value.trim();
+                        if (!email) {
+                            showErrorMessage('Please enter your email address');
+                            return;
+                        }
+
+                        try {
+                            // Get user data from the server
+                            const response = await fetch('/api/auth/dev/get-verification-code', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ email: email })
+                            });
+
+                            const data = await response.json();
+
+                            if (response.ok && data.verification_code) {
+                                document.getElementById('code-display').textContent = `Verification Code: ${data.verification_code}`;
+                                // Auto-fill the code field
+                                document.getElementById('code').value = data.verification_code;
+                            } else {
+                                document.getElementById('code-display').textContent = 'Could not retrieve verification code. Try resending.';
+                            }
+                        } catch (error) {
+                            document.getElementById('code-display').textContent = 'Error retrieving verification code.';
+                            console.error('Error:', error);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error checking development mode:', error);
+            }
+        }
+
+        document.getElementById('verificationForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+            const code = document.getElementById('code').value.trim();
+
+            // Clear previous messages
+            document.querySelectorAll('.error-message, .success-message').forEach(el => el.remove());
+
+            try {
+                const response = await fetch('/api/auth/verify-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email,
+                        code: code
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    showSuccessMessage('Email verified successfully! Redirecting to login...');
+
+                    // Redirect to login page after a short delay
+                    setTimeout(() => {
+                        window.location.href = '/login?verified=true';
+                    }, 2000);
+                } else {
+                    throw new Error(data.detail || 'Verification failed');
+                }
+            } catch (error) {
+                // Show error message
+                showErrorMessage(error.message);
+            }
+        });
+
+        document.getElementById('resendCode').addEventListener('click', async function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value.trim();
+
+            if (!email) {
+                showErrorMessage('Please enter your email address');
+                return;
+            }
+
+            // Clear previous messages
+            document.querySelectorAll('.error-message, .success-message').forEach(el => el.remove());
+
+            try {
+                const response = await fetch('/api/auth/resend-code', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        email: email
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // Show success message
+                    showSuccessMessage('Verification code resent! Please check your email.');
+                } else {
+                    throw new Error(data.detail || 'Failed to resend code');
+                }
+            } catch (error) {
+                // Show error message
+                showErrorMessage(error.message);
+            }
+        });
+
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            document.querySelector('.login-form').insertBefore(
+                successDiv,
+                document.querySelector('form')
+            );
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.querySelector('.login-form').insertBefore(
+                errorDiv,
+                document.querySelector('form')
+            );
+        }
+    </script>
+</body>
+</html>

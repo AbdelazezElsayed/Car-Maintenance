@@ -1,0 +1,122 @@
+# Use a slim Python image based on Debian for better compatibility
+FROM python:3.11-slim AS builder
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libc-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpng-dev \
+    libffi-dev \
+    libssl-dev \
+    libblas-dev \
+    curl \
+    wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --no-cache-dir --upgrade pip wheel setuptools
+
+# Copy requirements first to leverage caching
+COPY backend/requirements.txt .
+
+# Install dependencies into a virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+RUN pip install --no-cache-dir -r requirements.txt gunicorn
+
+# Development stage with additional tools
+FROM python:3.11-slim AS development
+
+# Set working directory
+WORKDIR /app
+
+# Install development dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libc-dev \
+    libjpeg-dev \
+    zlib1g-dev \
+    libpng-dev \
+    libffi-dev \
+    libssl-dev \
+    curl \
+    wget \
+    vim \
+    git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY backend/requirements.txt .
+
+# Install dependencies directly (not in venv for easier development)
+RUN pip install --no-cache-dir --upgrade pip wheel setuptools && \
+    pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir pytest pytest-cov flake8 black isort mypy
+
+# Set environment variables for development
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    DEBUG=1
+
+# Create necessary directories
+RUN mkdir -p /app/logs
+
+# Expose port
+EXPOSE 8000
+
+# Command to run the application in development mode
+CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# Production stage for a smaller final image
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install only runtime dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    wget \
+    libjpeg62-turbo \
+    zlib1g \
+    libpng16-16 \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy application files
+COPY main.py .
+COPY backend/ backend/
+
+# Create necessary directories
+RUN mkdir -p frontend/scripts frontend/pages/maintenance frontend/pages/admin frontend/pages/verify-email
+
+# Create non-root user with specific UID/GID for better security
+RUN groupadd -g 1001 appgroup && \
+    useradd -m -u 1000 -g appgroup appuser && \
+    chown -R appuser:appgroup /app
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Healthcheck using wget for better compatibility
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8000/api/health || exit 1
+
+# Run application with optimized settings
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:8000", "--workers", "2", "--worker-connections", "1000", "--timeout", "120", "--log-level", "info", "main:app"]

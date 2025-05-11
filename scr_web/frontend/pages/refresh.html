@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Refresher</title>
+    <!-- Meta tags to prevent caching -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        .button {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            font-size: 16px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .button.secondary {
+            background-color: #2196F3;
+        }
+        .button.secondary:hover {
+            background-color: #0b7dda;
+        }
+        .button.danger {
+            background-color: #f44336;
+        }
+        .button.danger:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>CarCare Pro Page Refresher</h1>
+        <p>If you're experiencing issues with stale content or pages not updating, use the buttons below to refresh the application.</p>
+        
+        <button class="button" id="refreshPage">Refresh Current Page</button>
+        <button class="button secondary" id="clearCache">Clear Cache & Refresh</button>
+        <button class="button danger" id="hardReset">Hard Reset (Clear All Data)</button>
+        
+        <p style="margin-top: 30px; font-size: 14px;">After refreshing, you'll be redirected to the login page.</p>
+    </div>
+    
+    <script>
+        // Simple refresh
+        document.getElementById('refreshPage').addEventListener('click', function() {
+            window.location.reload(true);
+        });
+        
+        // Clear cache and refresh
+        document.getElementById('clearCache').addEventListener('click', function() {
+            // Clear browser cache
+            if ('caches' in window) {
+                caches.keys().then(function(names) {
+                    for (let name of names) caches.delete(name);
+                });
+            }
+            
+            // Add timestamp to force refresh
+            window.location.href = '/login.html?_t=' + Date.now();
+        });
+        
+        // Hard reset - clear all data
+        document.getElementById('hardReset').addEventListener('click', function() {
+            if (confirm('This will clear all your local data. Continue?')) {
+                // Clear localStorage
+                localStorage.clear();
+                
+                // Clear sessionStorage
+                sessionStorage.clear();
+                
+                // Clear cookies
+                document.cookie.split(";").forEach(function(c) {
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+                });
+                
+                // Clear cache
+                if ('caches' in window) {
+                    caches.keys().then(function(names) {
+                        for (let name of names) caches.delete(name);
+                    });
+                }
+                
+                // Redirect to login
+                window.location.href = '/login.html?_t=' + Date.now();
+            }
+        });
+    </script>
+</body>
+</html>

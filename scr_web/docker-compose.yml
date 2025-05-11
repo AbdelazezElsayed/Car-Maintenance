@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: carcare_backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    restart: unless-stopped
+    environment:
+      - MONGODB_URI=mongodb://carcare_mongo:27017/CAR
+      - PYTHONPATH=/app
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-keep-it-secret}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-AIzaSyC88Vc0qqbebteYm81-tA_-3fwDA1ioG-4}
+    ports:
+      - "8000:8000"
+    networks:
+      - app-network
+    depends_on:
+      mongo:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    volumes:
+      - backend_logs:/app/logs
+
+  frontend:
+    container_name: carcare_frontend
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    restart: unless-stopped
+    ports:
+      - "80:80"  # Use standard HTTP port
+    networks:
+      - app-network
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "http://localhost/health || exit 0"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    volumes:
+      - nginx_logs:/var/log/nginx
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  mongo:
+    container_name: carcare_mongo
+    image: mongo:5.0-focal
+    restart: unless-stopped
+    volumes:
+      - mongo-data:/data/db
+      - mongo-config:/data/configdb
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - app-network
+    ports:
+      - "27017:27017"  # Use standard MongoDB port
+    environment:
+      - MONGO_INITDB_DATABASE=CAR
+      # Uncomment and set these for production
+      # - MONGO_INITDB_ROOT_USERNAME=${MONGO_USERNAME:-admin}
+      # - MONGO_INITDB_ROOT_PASSWORD=${MONGO_PASSWORD:-securepassword}
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/admin --quiet
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mongo-data:
+    driver: local
+  mongo-config:
+    driver: local
+  backend_logs:
+    driver: local
+  nginx_logs:
+    driver: local

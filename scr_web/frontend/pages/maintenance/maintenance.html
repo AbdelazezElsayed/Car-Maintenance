@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vehicle Maintenance - CarCare Pro</title>
+    <link rel="stylesheet" href="/styles/main.css">
+    <link rel="stylesheet" href="/styles/maintenance.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-car"></i>
+                    <span>CarCare Pro</span>
+                </div>
+            </div>
+            <ul class="nav-links">
+                <li>
+                    <a href="/index">
+                        <i class="fas fa-home"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/chat">
+                        <i class="fas fa-comments"></i>
+                        <span>AI Assistant</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/tire">
+                        <i class="fas fa-cog"></i>
+                        <span>Tire Analysis</span>
+                    </a>
+                </li>
+                <li class="active">
+                    <a href="/maintenance">
+                        <i class="fas fa-tools"></i>
+                        <span>Maintenance</span>
+                    </a>
+                </li>
+                <li id="admin-link" style="display: none;">
+                    <a href="/admin">
+                        <i class="fas fa-user-shield"></i>
+                        <span>Admin</span>
+                    </a>
+                </li>
+                <li class="logout">
+                    <a href="/login">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="dashboard-header">
+                <div class="welcome-section">
+                    <h1>Vehicle Maintenance Dashboard</h1>
+                    <p class="subtitle">Monitor your vehicle's health and maintenance status</p>
+                </div>
+            </header>
+
+            <!-- Status Cards -->
+            <div class="status-grid">
+                <!-- Oil Life Card -->
+                <div class="status-card">
+                    <div class="status-icon oil-icon">
+                        <i class="fas fa-oil-can"></i>
+                    </div>
+                    <div class="status-info">
+                        <h3>Oil Life</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 72%"></div>
+                        </div>
+                        <div class="status-value">72%</div>
+                    </div>
+                </div>
+
+                <!-- Battery Health Card -->
+                <div class="status-card">
+                    <div class="status-icon battery-icon">
+                        <i class="fas fa-car-battery"></i>
+                    </div>
+                    <div class="status-info">
+                        <h3>Battery Health</h3>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 95%"></div>
+                        </div>
+                        <div class="status-value">95%</div>
+                    </div>
+                </div>
+
+                <!-- Current Mileage Card -->
+                <div class="status-card">
+                    <div class="status-icon mileage-icon">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <div class="status-info">
+                        <h3>Current Mileage</h3>
+                        <div class="status-value">45,230</div>
+                        <div class="status-detail">Next service in 2000 miles</div>
+                    </div>
+                </div>
+
+                <!-- Engine Temperature Card -->
+                <div class="status-card">
+                    <div class="status-icon temp-icon">
+                        <i class="fas fa-thermometer-half"></i>
+                    </div>
+                    <div class="status-info">
+                        <h3>Engine Temperature</h3>
+                        <div class="status-value normal">Normal</div>
+                        <div class="status-detail">Operating within normal range</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tire Pressure Section -->
+            <div class="maintenance-section">
+                <h2>Tire Pressure (PSI)</h2>
+                <div class="tire-pressure-grid">
+                    <div class="tire-card">
+                        <h3>Front Left</h3>
+                        <div class="tire-pressure">32</div>
+                    </div>
+                    <div class="tire-card">
+                        <h3>Front Right</h3>
+                        <div class="tire-pressure">32</div>
+                    </div>
+                    <div class="tire-card">
+                        <h3>Rear Left</h3>
+                        <div class="tire-pressure">30</div>
+                    </div>
+                    <div class="tire-card">
+                        <h3>Rear Right</h3>
+                        <div class="tire-pressure">31</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Alerts & Notifications -->
+            <div class="maintenance-section">
+                <h2>Alerts & Notifications</h2>
+                <div class="alerts-list">
+                    <div class="alert-item warning">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div class="alert-content">
+                            <p>Tire rotation recommended</p>
+                        </div>
+                    </div>
+                    <div class="alert-item info">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="alert-content">
+                            <p>Oil change due in 2000 miles</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Maintenance History -->
+            <div class="maintenance-section">
+                <h2>Recent Maintenance History</h2>
+                <div class="maintenance-history">
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="history-details">
+                            <h3>Oil Change</h3>
+                            <div class="history-meta">
+                                <span class="history-date"><i class="far fa-calendar"></i> 2024-03-15</span>
+                                <span class="history-mileage"><i class="fas fa-road"></i> 43,000 miles</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="history-details">
+                            <h3>Brake Inspection</h3>
+                            <div class="history-meta">
+                                <span class="history-date"><i class="far fa-calendar"></i> 2024-02-28</span>
+                                <span class="history-mileage"><i class="fas fa-road"></i> 42,500 miles</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-item">
+                        <div class="history-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="history-details">
+                            <h3>Tire Rotation</h3>
+                            <div class="history-meta">
+                                <span class="history-date"><i class="far fa-calendar"></i> 2024-02-01</span>
+                                <span class="history-mileage"><i class="fas fa-road"></i> 41,800 miles</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/scripts/maintenance.js"></script>
+</body>
+</html>
