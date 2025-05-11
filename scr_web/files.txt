@@ -1,8 +1,0 @@
-front_end/
-├── backend/
-│   ├── tire.py                # FastAPI backend
-├── static/                    # Static files (CSS, JS, etc.)
-│   ├── style.css              # CSS file
-├── tire-classification.html   # HTML file
-
- 
